@@ -1,0 +1,26 @@
+language: generic
+os:
+- linux
+- osx
+env:
+  global:
+  - THIS_PACKAGE="csdms-topoflow-channels-diffusive-wave"
+  - TRAVIS_PYTHON_VERSION="2.7"
+  - NUMPY_VERSION="1.9"
+  - secure: EzYAp8jw4wr33gkpr5h+O3NI69By7Htdw85JbUvCEBOrc4sBk5E7lSeQAg7wXQVpMJytIGGJ1xiItkGCvaUDRug4R3iwCdtTZBP1qX6ccbZfSCIMwSgGeuwvAvq1PMjgjJDAv14epBWqskbtFizDhX1JfiK5FzpR/oMo5tY1NC2/2fTaKMFqifAIgVW6ipOKkq4ZABGd3NLOJFfC8yE5ak/sBPCQ8G/0jjxBBrntxxZbh5wVe2Z+8R2pTVZ4CAdhzjsTC9vbtfpeeJBIri1rB7p8dUcW4cfpu26CwtNs+IGe659LDQG8Yt5QWKZ1Jjjfff2/WPqjuJH6ooMdrIbM1JnzdhKCuPAGfLTwWDGeEDW80R+u3gu5ZrbwcPtZgjjrcWaHaS6jjTjuHoNhofznNgt2UioSjQ5hl35hqnYxYkmgna46M8LxaLDNtvpMth0CB0alQ12pgquoERhsLotAvsoFm/cUg8RbGNHafgGq7kiuxbRNjpVvfWM/wa1VFw9mgSW+3JTNOxI9vzDP4j/g0/wn62y6XAAbAMBe97s4fDawS/56CxVvA/Z3ZLf7Pf/Yyxk4+jSnd3/t7T9JQLPEXTaQkDXerfjAsClBCd0c4UykcYkXYfsKrwb4+34YgFe5VM5fGz+N6a0pK9AlxlYhUdRBjvkflh5entcuf4npmd0=
+sudo: false
+before_install:
+- |
+  if [[ $TRAVIS_OS_NAME == "osx" ]]; then
+    brew remove --force $(brew list)
+    brew cleanup -s
+    rm -rf $(brew --cache)
+  fi
+install:
+- bash ci/travis/install_python.sh $HOME/miniconda
+- export PATH="$HOME/miniconda/bin:$PATH"
+script:
+- conda build recipe -c conda-forge -c csdms-stack
+after_success:
+- if [[ $TRAVIS_BRANCH == "master" ]]; then export CHANNEL="main"; fi
+- bash ci/travis/deploy_to_anaconda.sh $THIS_PACKAGE
